@@ -120,6 +120,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "comparador"
+    }
+  },
+  "defaultProject": "comparador",
+  "cli": {
+    "defaultCollection": "@nativescript/schematics"
+  }
 }

@@ -1,0 +1,20 @@
+<ul class="list-group">
+  <li 
+    class="list-group-item"
+    *ngFor="let sm of supermarkets"
+  >
+  <button 
+    class="btn btn-default btn-sm"
+    (click)="updatePost(sm)"
+  >
+    Update
+  </button>
+  <button 
+    class="btn btn-default btn-sm"
+    (click)="deletePost(sm)"
+  >
+    Delete
+  </button>
+  {{post.title}}
+  </li>
+</ul>
