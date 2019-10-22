@@ -1,20 +1,32 @@
+<message [isError]="isError" [message]="erro"></message>
+<input 
+  type="hidden" 
+  class="form-control"
+  [(ngModel)]="supermarketid"
+>
+<input 
+  type="text" 
+  class="form-control"
+  (keyup.enter)="createSupermarket()"
+  [(ngModel)]="supermarketname"
+>
 <ul class="list-group">
   <li 
     class="list-group-item"
     *ngFor="let sm of supermarkets"
   >
   <button 
-    class="btn btn-default btn-sm"
-    (click)="updatePost(sm)"
+    class="btn btn-primary btn-sm"
+    (click)="copySupermarket(sm)"
   >
     Update
   </button>
   <button 
-    class="btn btn-default btn-sm"
-    (click)="deletePost(sm)"
+    class="btn btn-primary btn-sm"
+    (click)="deleteSupermarket(sm)"
   >
     Delete
   </button>
-  {{post.title}}
+  {{sm.name}}
   </li>
 </ul>

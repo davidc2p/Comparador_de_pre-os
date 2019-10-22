@@ -9,11 +9,15 @@ import 'rxjs/add/observable/throw';
 
 import { AppError } from '../common/app.error';
 import { InvalidRequest } from '../common/invalid-request-error';
+import { NotAllowedError } from '../common/not-allowed-error';
+
 
 @Injectable()
 export class DataService {
+  url: string;
 
-  constructor(private url: string, private http: Http) { }
+  constructor(private http: Http) { 
+  }
 
   getAll() {
     return this.http.get(this.url)
@@ -31,7 +35,7 @@ export class DataService {
   }
 
   update(resource) {
-    return this.http.patch(this.url + '/' + resource.id, JSON.stringify({isRead: true}))
+    return this.http.put(this.url, JSON.stringify(resource))
       .map(response => response.json())
       .catch(this.handleError);
   }
@@ -55,6 +59,10 @@ export class DataService {
 
     if (error.status === 404) {
       return Observable.throw(new NotFoundError());
+    } 
+    
+    if (error.status === 405) {
+      return Observable.throw(new NotAllowedError(error));
     } else {
       return Observable.throw(new AppError(error));
     }
