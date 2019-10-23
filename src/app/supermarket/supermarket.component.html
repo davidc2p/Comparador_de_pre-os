@@ -1,32 +1,36 @@
-<message [isError]="isError" [message]="erro"></message>
-<input 
-  type="hidden" 
-  class="form-control"
-  [(ngModel)]="supermarketid"
->
-<input 
-  type="text" 
-  class="form-control"
-  (keyup.enter)="createSupermarket()"
-  [(ngModel)]="supermarketname"
->
-<ul class="list-group">
-  <li 
-    class="list-group-item"
-    *ngFor="let sm of supermarkets"
-  >
-  <button 
-    class="btn btn-primary btn-sm"
-    (click)="copySupermarket(sm)"
-  >
-    Update
-  </button>
-  <button 
-    class="btn btn-primary btn-sm"
-    (click)="deleteSupermarket(sm)"
-  >
-    Delete
-  </button>
-  {{sm.name}}
-  </li>
-</ul>
+<div class="row">
+  <div class="col-10 offset-1">
+    <message [isError]="isError" [message]="erro"></message>
+    <input 
+      type="hidden" 
+      class="form-control"
+      [(ngModel)]="supermarketid"
+    >
+    <input 
+      type="text" 
+      class="form-control"
+      (keyup.enter)="createSupermarket()"
+      [(ngModel)]="supermarketname"
+    >
+    <ul class="list-group">
+      <li 
+        class="list-group-item"
+        *ngFor="let sm of supermarkets"
+      >
+      <button 
+        class="btn btn-primary btn-sm"
+        (click)="copySupermarket(sm)"
+      >
+        Update
+      </button>
+      <button 
+        class="btn btn-primary btn-sm"
+        (click)="deleteSupermarket(sm)"
+      >
+        Delete
+      </button>
+      {{sm.name}}
+      </li>
+    </ul>
+  </div>
+</div>
