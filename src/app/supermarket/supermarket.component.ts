@@ -4,6 +4,9 @@ import { Component, OnInit, } from '@angular/core';
 import { AppError } from '../common/app.error';
 import { InvalidRequest } from '../common/invalid-request-error';
 import { NotAllowedError } from '../common/not-allowed-error';
+import { UserService } from '../services/user.service';
+import { Observable } from 'rxjs/Observable';
+import { concat, empty } from 'rxjs';
 //import { DataService } from '../services/data.service';
 
 @Component({
@@ -18,7 +21,7 @@ export class SupermarketComponent implements OnInit {
   erro: string = "";
   isError: boolean;
 
-  constructor(private service: SupermarketService) { }
+  constructor(private service: SupermarketService, private userService: UserService) { }
 
   createSupermarket() {
       if (this.supermarketid !== null) {
@@ -29,7 +32,7 @@ export class SupermarketComponent implements OnInit {
   }
 
   insertSupermarket() {
-    let payload = { method: 'setSupermarket', name: this.supermarketname };
+    let payload = { method: 'setSupermarket', access_token: this.userService.user().access_token, name: this.supermarketname };
 		//Optimistic display of values (no id so far)
 		let sm = { id: 0, name: payload['name'] };
 		this.supermarkets.splice(0, 0, sm);
@@ -42,8 +45,8 @@ export class SupermarketComponent implements OnInit {
     this.service.create(payload)
       .subscribe(newSm => {
         if (newSm.id !== undefined) {
-						//Pessimistic updated of ID
-            this.supermarkets[0].id = newSm.id;
+					//Pessimistic updated of ID
+					this.supermarkets[0].id = newSm.id;
         }
 				//Send messages from service
         if (newSm.success !== undefined) {
@@ -55,29 +58,29 @@ export class SupermarketComponent implements OnInit {
         console.log(newSm);
       }, 
       (error: AppError) => {
-					//Remove item optimistically inserted
-					this.supermarkets.splice(0, 1);
+				//Remove item optimistically inserted
+				this.supermarkets.splice(0, 1);
 
-          this.isError = true;
-          let strError = error.originalError.json();
-          this.erro = strError.message;
+				this.isError = true;
+				let strError = error.originalError.json();
+				this.erro = strError.message;
       });
   }
 
   copySupermarket(sm) {
-      this.supermarketid = sm.id;
-      this.supermarketname = sm.name;
+		this.supermarketid = sm.id;
+		this.supermarketname = sm.name;
   }
 
   updateSupermarket() {
-    let payload = { method: 'updSupermarket', id: this.supermarketid, name: this.supermarketname };
+    let payload = { method: 'updSupermarket', access_token: this.userService.user().access_token, id: this.supermarketid, name: this.supermarketname };
     let sm = { id: this.supermarketid, name: this.supermarketname };
     let backSupermarketname: string = "";
     for (let i=0; i < this.supermarkets.length; i++) {
-        if (sm.id === this.supermarkets[i].id) {
-            backSupermarketname = this.supermarkets[i].name;
-            this.supermarkets[i].name = sm.name;
-        }
+			if (sm.id === this.supermarkets[i].id) {
+					backSupermarketname = this.supermarkets[i].name;
+					this.supermarkets[i].name = sm.name;
+			}
     }
     this.service.url = 'http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php';
     this.service.update(payload)
@@ -110,9 +113,10 @@ export class SupermarketComponent implements OnInit {
   }
 
   deleteSupermarket(sm) {
+
     let index = this.supermarkets.indexOf(sm);
     this.supermarkets.splice(index, 1);
-    this.service.url = 'http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=delSupermarket&id='+sm.id;
+    this.service.url = `http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=delSupermarket&access_token=${this.userService.user().access_token}&id=${sm.id}`;
 
     this.service.delete(sm)
       .subscribe(newSm => {
@@ -139,9 +143,68 @@ export class SupermarketComponent implements OnInit {
     //this.http.patch(this.url, JSON.stringify(post))
   }
 
+  subM() {
+    this.service.url = `http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=getSupermarket&access_token=${this.userService.user().access_token}`;
+    this.service.getAll().subscribe(sm => {
+      return this.supermarkets = sm
+    },  
+    error => {
+      this.isError = true;
+      let strError = error.originalError.json();
+      this.erro = strError.message;
+    });
+  }
+
   ngOnInit() {
-      this.service.url = 'http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=getSupermarket';
-      this.service.getAll().subscribe(sm => this.supermarkets = sm); 
+/*
+    this.userService.getContext().then(() => {
+      this.service.url = `http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=getSupermarket&access_token=${this.userService.user().access_token}`;
+      this.service.getAll()
+      .subscribe(sm => {
+        return this.supermarkets = sm
+      },  
+      error => {
+        this.isError = true;
+        let strError = error.originalError.json();
+        this.erro = strError.message;
+      });
+    });
+*/
+    // concat(
+    //   this.userService.getContext(),
+    //   this.subM()
+    // )
+
+    this.userService.getContext2()
+      .then(() => {
+        this.service.url = `http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=getSupermarket&access_token=${this.userService.user().access_token}`;
+        this.service.getAll().subscribe(sm => {
+          return this.supermarkets = sm
+        },  
+        error => {
+          this.isError = true;
+          let strError = error.originalError.json();
+          this.erro = strError.message;
+        });
+      }
+
+    );
+
+    // empty().pipe(
+    //   this.userService.getContext(),
+    //   this.service.getAll()
+    // );
+
+    // this.service.url = `http://127.0.0.1:8080/scrapingweb/API/V1/supermarket/index.php?method=getSupermarket&access_token=${this.userService.user().access_token}`;
+    // this.service.getAll()
+    //   .subscribe(sm => {
+    //     return this.supermarkets = sm
+    //   },  
+    //   error => {
+    //     this.isError = true;
+    //     let strError = error.originalError.json();
+    //     this.erro = strError.message;
+    //   });
   }
 
 }

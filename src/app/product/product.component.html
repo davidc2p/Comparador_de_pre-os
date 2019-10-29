@@ -1,0 +1,13 @@
+<p>product works!</p>
+<form #f="ngForm" (ngSubmit)="submit(f.value)">
+    <div class="form-group">
+        <label for="category">Category</label>
+        <select required ngModel name="category" #category="ngModel" id="category" class="form-control">
+          <option value=""></option>
+          <option *ngFor="let cat of categories" [ngValue]="cat">{{cat.name}}</option>
+        </select>
+    </div>
+    <div *ngIf="category.touched && category.invalid" class="alert alert-danger">
+        You should select a category
+    </div>    
+</form>

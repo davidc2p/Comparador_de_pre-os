@@ -15,8 +15,10 @@ import { NotAllowedError } from '../common/not-allowed-error';
 @Injectable()
 export class DataService {
   url: string;
-
-  constructor(private http: Http) { 
+  http: Http;
+  
+  constructor(http: Http) { 
+      this.http= http;
   }
 
   getAll() {

@@ -1,0 +1,45 @@
+<h1>Login</h1>
+<div class="row">
+    <div class="col-6 offset-5">
+        <form [formGroup]="form" (ngSubmit)="login()">
+            <div *ngIf="form.errors" class="alert alert-danger">
+                The email or password is invalid,
+            </div>
+            <div formGroupName="account">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input 
+                        formControlName="email"
+                        id="email" 
+                        type="text" 
+                        class="form-control"
+                    >
+                    <div *ngIf="email.pending">Checking for uniqueness...</div>
+                    <div *ngIf="email.touched && email.invalid" class="alert alert-danger">
+                        <div *ngIf="email.errors.required">User name is required.</div>
+                        <div *ngIf="email.errors.minlength">Length should be at least {{ email.errors.minlength.requiredLength }} chars.</div>
+                        <div *ngIf="email.errors.isNotEmail">Not a valid email.</div>
+                        <div *ngIf="form.get('account.email').errors.emailExists">Email already taken.</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        formControlName="password"
+                        id="password" 
+                        type="text" 
+                        class="form-control">
+                </div>
+            </div>
+            <p>
+		        {{ form.value | json }}
+                {{ email.touched | json }}
+                {{ email.invalid | json }}
+	        </p>
+            <p>
+		        {{ form.get('email') | json }}
+	        </p>
+            <button class="btn btn-primary" [disabled]="form.invalid || form.pending" type="submit">Login</button>
+        </form>
+    </div>
+</div>
